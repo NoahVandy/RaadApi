@@ -19,25 +19,27 @@ app.post('/admin/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  console.log("username", username);
-  console.log("password", password);
-
   if(username && password) {
-    res.send("ok");
+    res.send("ok, username: " + username + " password " + password);
   }
   else {
-    res.send("not ok");
+    res.send("no username or password received");
   }
   
 })
 
 app.post('/admin/create', (req, res) => {
-
+  
   const name = req.body.name;
   const desc = req.body.desc;
   const picture = req.body.picture;
 
-  res.send("ok");
+  if(name && desc && picture) {
+    res.send("all fields received name: " + name + " desc: " + desc + " pic: " + picture);
+  }
+  else {
+    res.send("no username or password received");
+  }
 })
 
 app.listen(port, () => {
