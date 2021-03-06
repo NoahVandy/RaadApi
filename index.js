@@ -39,11 +39,12 @@ app.post('/admin/login', (req, res) => {
       }
       if(result.length) {
         console.log(result);
-        res.sendStatus(200);
+        res.send(result);
       }
       else {
         console.log("no user found");
-        res.send('no user found');
+        // res.send('no user found');
+        res.sendStatus(500);
       }
     });
   }
@@ -53,14 +54,14 @@ app.post('/admin/login', (req, res) => {
   
 })
 
-app.post('/admin/create', (req, res) => {
+app.post('/admin/createItem', (req, res) => {
   
   const name = req.body.name;
-  const desc = req.body.desc;
-  const picture = req.body.picture;
+  const price = req.body.price;
+  const picUrl = req.body.picUrl;
 
-  if(name && desc && picture) {
-    const sql = `INSERT INTO STORE_ITEMS VALUES (null, '${name}', '${desc}', '${picture}')`;
+  if(name && price && picUrl) {
+    const sql = `INSERT INTO STORE_ITEMS VALUES (null, '${name}', ${price}, '${picUrl}')`;
 
     connection.query(sql, (err, result) => {
       if(err) {
@@ -74,7 +75,7 @@ app.post('/admin/create', (req, res) => {
     })
   }
   else {
-    res.send("no username or password received");
+    res.send("no picUrl");
   }
 })
 
@@ -96,7 +97,7 @@ app.get('/admin/getItems', (req, res) => {
 
 app.post('/admin/deleteItem', (req, res) => {
   
-  const itemId = req.body.itemId;
+  const itemId = req.body.id;
 
   const sql = `DELETE FROM STORE_ITEMS WHERE id = ${itemId}`;
 
@@ -130,10 +131,10 @@ app.post('/admin/updateItem', (req, res) => {
 
   const id = req.body.id;
   const name = req.body.name;
-  const desc = req.body.desc;
+  const price = req.body.price;
   const picUrl = req.body.picUrl;
 
-  const sql = `UPDATE STORE_ITEMS SET \`name\` = '${name}', \`desc\` = '${desc}', \`picUrl\` = '${picUrl}' WHERE id = ${id}`;
+  const sql = `UPDATE STORE_ITEMS SET \`name\` = '${name}', \`price\` = ${price}, \`picUrl\` = '${picUrl}' WHERE id = ${id}`;
 
   connection.query(sql, (err, result) => {
     if (err) {
