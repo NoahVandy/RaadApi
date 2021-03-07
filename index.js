@@ -27,8 +27,9 @@ app.get('/', (req, res) => {
 
 app.post('/admin/login', (req, res) => {
 
-  const username = req.body.username;
-  const password = req.body.password;
+  const credentials = req.body.credentials;
+
+  const { username, password } = credentials;
 
   if(username && password) {
     const sql = `SELECT * FROM ADMIN_USERS where username = '${username}' AND password = '${password}';`;
@@ -56,9 +57,15 @@ app.post('/admin/login', (req, res) => {
 
 app.post('/admin/createItem', (req, res) => {
   
-  const name = req.body.name;
-  const price = req.body.price;
-  const picUrl = req.body.picUrl;
+  const product = req.body.product;
+  const { name, price, picUrl } = product;
+  
+  console.log(product)
+
+  if(isNaN(price)) {
+    res.status(501).send("Price was not a number");
+    return;
+  }
 
   if(name && price && picUrl) {
     const sql = `INSERT INTO STORE_ITEMS VALUES (null, '${name}', ${price}, '${picUrl}')`;
@@ -75,7 +82,7 @@ app.post('/admin/createItem', (req, res) => {
     })
   }
   else {
-    res.send("no picUrl");
+    res.sendStatus(500);
   }
 })
 
@@ -129,10 +136,14 @@ app.post('/admin/deleteItem', (req, res) => {
 
 app.post('/admin/updateItem', (req, res) => {
 
-  const id = req.body.id;
-  const name = req.body.name;
-  const price = req.body.price;
-  const picUrl = req.body.picUrl;
+  const product = req.body.product;
+
+  const { id, name, price, picUrl } = product;
+
+  if(isNaN(price)) {
+    res.status(501).send("price was not a number");
+    return;
+  }
 
   const sql = `UPDATE STORE_ITEMS SET \`name\` = '${name}', \`price\` = ${price}, \`picUrl\` = '${picUrl}' WHERE id = ${id}`;
 
