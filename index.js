@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const port = 3001;
+const nodemailer = require('nodemailer')
 
 const connection = mysql.createConnection({
   host: 'cst-323.cknx30qxg2cd.us-east-2.rds.amazonaws.com',
@@ -174,16 +175,63 @@ app.get('/admin/getItem/:id', (req, res) => {
   connection.query(sql, (err, result) => {
     if(err) {
       console.log(err);
-      res.sendStatus(500);
+      res.status(500).send(err);
+      return;
     }
     if(result.length) {
       console.log(result);
-      res.send(result);
+      res.status(200).send(result);
+      return;
     }
     else if(result.length === 0) {
-      res.send("no item found");
+      res.status(500).send("no item found");
+      return;
     }
   })
+})
+
+app.post('/admin/nominate', async (req, res) => {
+
+  const emailPayload = req.body.emailPayload;
+
+  if(!emailPayload) {
+    res.status(500).send("please provide an email payload");
+    return;
+  }
+
+  const { from, to, subject, text, html } = emailPayload;
+
+  // Generate test SMTP service account from ethereal.email
+  // Only needed if you don't have a real mail account for testing
+  let testAccount = await nodemailer.createTestAccount();
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: testAccount.user, // generated ethereal user
+      pass: testAccount.pass, // generated ethereal password
+    },
+  });
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: from, 
+    to: 'RAAD@email.com', 
+    subject: 'Nomination', 
+    text: text,
+    // html: html, 
+  });
+
+  console.log("Message sent: %s", info.messageId);
+
+  if(info) {
+    res.status(200).send(nodemailer.getTestMessageUrl(info));
+  }
+
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 })
 
 app.listen(port, () => {
