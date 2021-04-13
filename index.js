@@ -3,7 +3,7 @@ const app = express()
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
-const port = 3001;
+const port = process.env.PORT || 3001;
 const nodemailer = require('nodemailer')
 
 const connection = mysql.createConnection({
